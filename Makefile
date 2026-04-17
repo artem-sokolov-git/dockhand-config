@@ -46,7 +46,9 @@ backup: ## Backup data directory
 
 restore: ## Restore data directory from latest backup
 	@echo "$(YELLOW)Starting restore...$(RESET)"
+	@$(MAKE) stop
 	@$(SCRIPT) restore
+	@$(MAKE) run
 	@echo "$(GREEN)Restore complete$(RESET)"
 
 .DEFAULT_GOAL := help

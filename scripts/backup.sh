@@ -13,8 +13,8 @@ fi
 
 source "$ENV_FILE"
 
-SOURCE="${BACKUP_SOURCE:-$HOME/.dockhand/data}"
-DEST="${BACKUP_DEST:-/mnt/samsung_ssd/dockhand/backup}"
+SOURCE="${DOCKHAND_DATA}"
+DEST="${DOCKHAND_BACKUPS}"
 DATE=$(date +%Y%m%d_%H%M%S)
 
 usage() {
@@ -24,7 +24,7 @@ usage() {
 
 do_backup() {
   mkdir -p "$DEST"
-  ARCHIVE="$DEST/dockhand-data-$DATE.tar.gz"
+  ARCHIVE="$DEST/$DATE.tar.gz"
 
   echo "Source : $SOURCE"
   echo "Dest   : $DEST"
@@ -39,9 +39,9 @@ do_backup() {
 do_restore() {
   if [[ -z "$1" ]]; then
     echo "Available backups:"
-    ls -lht "$DEST"/dockhand-data-*.tar.gz
+    ls -lht "$DEST"/*.tar.gz
     echo ""
-    ARCHIVE=$(ls -t "$DEST"/dockhand-data-*.tar.gz | head -1)
+    ARCHIVE=$(ls -t "$DEST"/*.tar.gz | head -1)
     echo "Restoring latest: $ARCHIVE"
   else
     ARCHIVE="$1"

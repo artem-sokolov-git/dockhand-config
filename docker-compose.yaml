@@ -3,9 +3,9 @@ services:
     image: fnsys/dockhand:latest
     container_name: dockhand
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - ${HOME_DIR}/.dockhand/data:/app/data
       - ${HOME_DIR}/:${HOME_DIR}
+      - ${DOCKHAND_DATA}:/app/data
+      - /var/run/docker.sock:/var/run/docker.sock
     ports:
       - ${PORT:-3000}:3000
     restart: unless-stopped
