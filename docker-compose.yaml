@@ -1,9 +1,11 @@
+name: dockhand
+
 services:
   dockhand:
     image: fnsys/dockhand:latest
     container_name: dockhand
     volumes:
-      - ${HOME_DIR}/:${HOME_DIR}
+      - ${HOME_DIR}:${HOME_DIR}
       - ${DOCKHAND_DATA}:/app/data
       - /var/run/docker.sock:/var/run/docker.sock
     ports:
@@ -13,3 +15,4 @@ services:
 networks:
   default:
     name: dockhand_network
+    external: true
