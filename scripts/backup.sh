@@ -36,7 +36,9 @@ do_backup() {
   echo "Backing up..."
   if tar -czf "$ARCHIVE_TMP" -C "$(dirname "$SOURCE")" "$(basename "$SOURCE")"; then
     mv "$ARCHIVE_TMP" "$ARCHIVE"
+    shasum -a 256 "$ARCHIVE" > "${ARCHIVE}.sha256"
     echo "Done: $ARCHIVE"
+    echo "Hash: $(cat "${ARCHIVE}.sha256" | cut -d' ' -f1)"
     echo "Size: $(du -sh "$ARCHIVE" | cut -f1)"
   else
     rm -f "$ARCHIVE_TMP"
@@ -65,6 +67,18 @@ do_restore() {
   if [[ ! -f "$archive" ]]; then
     echo "Error: $archive not found"
     exit 1
+  fi
+
+  local checksum_file="${archive}.sha256"
+  if [[ -f "$checksum_file" ]]; then
+    echo "Verifying checksum..."
+    if ! shasum -a 256 --check "$checksum_file" --status; then
+      echo "Error: checksum mismatch, archive may be corrupted"
+      exit 1
+    fi
+    echo "Checksum OK"
+  else
+    echo "Warning: no checksum file found, skipping verification"
   fi
 
   if [[ -t 0 ]]; then
