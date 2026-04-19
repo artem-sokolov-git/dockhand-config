@@ -29,7 +29,9 @@ restart: ## Restart container
 
 backup: ## Backup data directory
 	@echo "$(YELLOW)Starting backup...$(RESET)"
+	@$(MAKE) stop
 	@$(SCRIPT) backup
+	@$(MAKE) run
 	@echo "$(GREEN)Backup complete$(RESET)"
 
 restore: ## Restore data directory from latest backup
