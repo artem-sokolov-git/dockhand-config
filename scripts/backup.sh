@@ -13,6 +13,9 @@ fi
 
 source "$ENV_FILE"
 
+: "${DOCKHAND_DATA:?Error: DOCKHAND_DATA is not set in .env}"
+: "${DOCKHAND_BACKUPS:?Error: DOCKHAND_BACKUPS is not set in .env}"
+
 SOURCE="${DOCKHAND_DATA}"
 DEST="${DOCKHAND_BACKUPS}"
 DATE=$(date +%Y%m%d_%H%M%S)
@@ -43,26 +46,37 @@ do_backup() {
 }
 
 do_restore() {
-  if [[ -z "$1" ]]; then
+  local archive
+
+  if [[ -z "${1:-}" ]]; then
+    if [[ ! -d "$DEST" ]] || ! compgen -G "$DEST/*.tar.gz" > /dev/null 2>&1; then
+      echo "Error: no backups found in $DEST"
+      exit 1
+    fi
     echo "Available backups:"
-    ls -lht "$DEST"/*.tar.gz 2>/dev/null || { echo "Error: no backups found in $DEST"; exit 1; }
+    ls -lht "$DEST"/*.tar.gz
     echo ""
-    ARCHIVE=$(ls -t "$DEST"/*.tar.gz | head -1)
-    echo "Restoring latest: $ARCHIVE"
+    archive=$(find "$DEST" -maxdepth 1 -name "*.tar.gz" -print0 | xargs -0 ls -t | head -1)
+    echo "Restoring latest: $archive"
   else
-    ARCHIVE="$1"
+    archive="$1"
   fi
 
-  if [[ ! -f "$ARCHIVE" ]]; then
-    echo "Error: $ARCHIVE not found"
+  if [[ ! -f "$archive" ]]; then
+    echo "Error: $archive not found"
     exit 1
   fi
 
-  read -p "This will overwrite $SOURCE. Continue? [y/N] " confirm
-  [[ "$confirm" != "y" ]] && echo "Aborted." && exit 0
+  if [[ -t 0 ]]; then
+    read -r -p "This will replace $SOURCE. Continue? [y/N] " confirm
+    [[ "$confirm" != "y" ]] && echo "Aborted." && exit 0
+  else
+    echo "Non-interactive mode: proceeding with restore of $archive"
+  fi
 
-  echo "Restoring from $ARCHIVE..."
-  tar -xzf "$ARCHIVE" -C "$(dirname "$SOURCE")"
+  echo "Restoring from $archive..."
+  rm -rf "$SOURCE"
+  tar -xzf "$archive" -C "$(dirname "$SOURCE")"
 
   echo "Done."
 }
