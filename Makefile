@@ -27,18 +27,6 @@ restart: ## Restart container
 	@$(MAKE) run
 	@echo "$(GREEN)Container restarted$(RESET)"
 
-commit-and-push: ## Commit all changes with timestamp message and push on github
-	@echo "$(YELLOW)Creating timestamp commit...$(RESET)"
-	@git add -A
-	@if git diff-index --quiet HEAD --; then \
-		echo "$(YELLOW)No changes to commit$(RESET)"; \
-	else \
-		TIMESTAMP=$$(date '+%Y-%m-%d %H:%M:%S'); \
-		git commit -m "$$TIMESTAMP"; \
-		echo "$(GREEN)Commit $$TIMESTAMP is created$(RESET)"; \
-	fi
-	@git push
-
 backup: ## Backup data directory
 	@echo "$(YELLOW)Starting backup...$(RESET)"
 	@$(SCRIPT) backup
@@ -50,6 +38,18 @@ restore: ## Restore data directory from latest backup
 	@$(SCRIPT) restore
 	@$(MAKE) run
 	@echo "$(GREEN)Restore complete$(RESET)"
+
+commit-and-push: ## Commit all changes with timestamp message and push on github
+	@echo "$(YELLOW)Creating timestamp commit...$(RESET)"
+	@git add -A
+	@if git diff-index --quiet HEAD --; then \
+		echo "$(YELLOW)No changes to commit$(RESET)"; \
+	else \
+		TIMESTAMP=$$(date '+%Y-%m-%d %H:%M:%S'); \
+		git commit -m "$$TIMESTAMP"; \
+		echo "$(GREEN)Commit $$TIMESTAMP is created$(RESET)"; \
+	fi
+	@git push
 
 .DEFAULT_GOAL := help
 

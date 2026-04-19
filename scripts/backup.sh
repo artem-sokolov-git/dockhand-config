@@ -1,7 +1,7 @@
 #!/bin/bash
 # ~/.dockhand/scripts/backup.sh
 
-set -e
+set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ENV_FILE="$SCRIPT_DIR/../.env"
@@ -25,21 +25,27 @@ usage() {
 do_backup() {
   mkdir -p "$DEST"
   ARCHIVE="$DEST/$DATE.tar.gz"
+  ARCHIVE_TMP="${ARCHIVE}.tmp"
 
   echo "Source : $SOURCE"
   echo "Dest   : $DEST"
   echo ""
   echo "Backing up..."
-  tar -czf "$ARCHIVE" -C "$(dirname $SOURCE)" "$(basename $SOURCE)"
-
-  echo "Done: $ARCHIVE"
-  echo "Size: $(du -sh $ARCHIVE | cut -f1)"
+  if tar -czf "$ARCHIVE_TMP" -C "$(dirname "$SOURCE")" "$(basename "$SOURCE")"; then
+    mv "$ARCHIVE_TMP" "$ARCHIVE"
+    echo "Done: $ARCHIVE"
+    echo "Size: $(du -sh "$ARCHIVE" | cut -f1)"
+  else
+    rm -f "$ARCHIVE_TMP"
+    echo "Error: backup failed, incomplete archive removed"
+    exit 1
+  fi
 }
 
 do_restore() {
   if [[ -z "$1" ]]; then
     echo "Available backups:"
-    ls -lht "$DEST"/*.tar.gz
+    ls -lht "$DEST"/*.tar.gz 2>/dev/null || { echo "Error: no backups found in $DEST"; exit 1; }
     echo ""
     ARCHIVE=$(ls -t "$DEST"/*.tar.gz | head -1)
     echo "Restoring latest: $ARCHIVE"
@@ -56,7 +62,7 @@ do_restore() {
   [[ "$confirm" != "y" ]] && echo "Aborted." && exit 0
 
   echo "Restoring from $ARCHIVE..."
-  tar -xzf "$ARCHIVE" -C "$(dirname $SOURCE)"
+  tar -xzf "$ARCHIVE" -C "$(dirname "$SOURCE")"
 
   echo "Done."
 }
