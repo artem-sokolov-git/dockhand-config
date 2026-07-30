@@ -27,6 +27,9 @@ restart: ## Restart container
 	@$(MAKE) run
 	@echo "$(GREEN)Container restarted$(RESET)"
 
+backup: ## Create data backup via rsync to samsung_ssd
+	@$(SCRIPT)
+
 commit-and-push: ## Commit all changes with timestamp message and push on github
 	@echo "$(YELLOW)Creating timestamp commit...$(RESET)"
 	@git add -A

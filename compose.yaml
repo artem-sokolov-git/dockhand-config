@@ -5,11 +5,11 @@ services:
     image: fnsys/dockhand:latest
     container_name: dockhand
     volumes:
-      - ${HOME_DIR}:${HOME_DIR}
-      - ${DOCKHAND_DATA}:/app/data
+      - ./data:/app/data
+      - ./compose.yaml:/app/compose.yaml
       - /var/run/docker.sock:/var/run/docker.sock
     ports:
-      - 100.94.16.8:${PORT:-3000}:3000
+      - 100.94.16.8:3000:3000
     restart: unless-stopped
 
 networks:
