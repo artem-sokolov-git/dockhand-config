@@ -6,6 +6,8 @@ YELLOW=\033[33m
 CYAN=\033[36m
 RESET=\033[0m
 
+MAKEFLAGS += --no-print-directory
+
 DC = docker compose
 SCRIPT = ./scripts/backup.sh
 
