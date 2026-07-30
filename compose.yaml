@@ -9,7 +9,7 @@ services:
       - ${DOCKHAND_DATA}:/app/data
       - /var/run/docker.sock:/var/run/docker.sock
     ports:
-      - ${PORT:-3000}:3000
+      - 100.94.16.8:${PORT:-3000}:3000
     restart: unless-stopped
 
 networks:

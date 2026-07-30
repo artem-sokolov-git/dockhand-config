@@ -6,8 +6,6 @@ YELLOW=\033[33m
 CYAN=\033[36m
 RESET=\033[0m
 
-MAKEFLAGS += --no-print-directory
-
 DC = docker compose
 SCRIPT = ./scripts/backup.sh
 
@@ -26,20 +24,6 @@ restart: ## Restart container
 	@$(MAKE) stop
 	@$(MAKE) run
 	@echo "$(GREEN)Container restarted$(RESET)"
-
-backup: ## Backup data directory
-	@echo "$(YELLOW)Starting backup...$(RESET)"
-	@$(MAKE) stop
-	@sudo $(SCRIPT) backup
-	@$(MAKE) run
-	@echo "$(GREEN)Backup complete$(RESET)"
-
-restore: ## Restore data directory from latest backup
-	@echo "$(YELLOW)Starting restore...$(RESET)"
-	@$(MAKE) stop
-	@sudo $(SCRIPT) restore
-	@$(MAKE) run
-	@echo "$(GREEN)Restore complete$(RESET)"
 
 commit-and-push: ## Commit all changes with timestamp message and push on github
 	@echo "$(YELLOW)Creating timestamp commit...$(RESET)"
